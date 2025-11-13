@@ -4,6 +4,10 @@ using catalogoProductos.Application.Interfaces;
 using catalogoProductos.Application.Services;
 using catalogoProductos.Infrastructure.Extensions;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
+// *** AJUSTE NECESARIO: Agrega el using a tu DbContext para la gestión de migraciones. ***
+// Reemplaza 'catalogoProductos.Infrastructure.Context' con la ruta real a tu DbContext.
+using catalogoProductos.Infrastructure.Context; 
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,10 +15,9 @@ var builder = WebApplication.CreateBuilder(args);
 // CONFIGURACIÓN DE SERVICIOS
 // ----------------------------------------
 
-// Agrega servicios de Swagger (documentación API)
 builder.Services.AddEndpointsApiExplorer();
 
-// Swagger con autorización JWT
+// Swagger con autorización JWT (No necesita cambios internos)
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new() { Title = "catalogoProductos.Api", Version = "v1" });
@@ -47,24 +50,28 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 // ----------------------------------------
-// CONFIGURACIÓN DE JWT
+// CONFIGURACIÓN DE JWT (CORRECCIÓN DE ROBUSTEZ)
 // ----------------------------------------
 
 var jwtSettings = builder.Configuration.GetSection("Jwt");
+
+// *** CORRECCIÓN CRÍTICA 1: Verifica que la clave JWT exista o falla de forma controlada ***
+var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("La clave JWT (Jwt:Key) no está configurada. Revise las Variables de Entorno en Railway.");
+
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
-            ValidateIssuer = true, // Valida el emisor
-            ValidateAudience = true, // Valida el receptor
-            ValidateLifetime = true, // Valida que el token no haya expirado
-            ValidateIssuerSigningKey = true, // Valida la firma
+            ValidateIssuer = true, 
+            ValidateAudience = true, 
+            ValidateLifetime = true, 
+            ValidateIssuerSigningKey = true, 
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtSettings["Key"]!)
+                Encoding.UTF8.GetBytes(jwtKey) // Usa la clave verificada
             )
         };
     });
@@ -74,8 +81,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // ----------------------------------------
 
 builder.Services.AddAuthorization();
-
-// Controladores de la API
 builder.Services.AddControllers();
 
 // Inyección de dependencias de la capa Infrastructure
@@ -86,17 +91,48 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 
 var app = builder.Build();
 
+// -------------------------------------------------------------
+// ********** CORRECCIÓN CRÍTICA 2: GESTIÓN DE MIGRACIONES EN EL ARRANQUE **************
+// Esto hace el arranque MÁS ROBUSTO al intentar aplicar las migraciones de la DB.
+// -------------------------------------------------------------
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<catalogoProductosContext>(); // Asume el nombre de tu DbContext
+    try
+    {
+        // Esto aplica las migraciones si existen. Si la DB no está lista, puede lanzar la excepción.
+        context.Database.Migrate(); 
+    }
+    catch (Exception ex)
+    {
+        // Si falla la migración, registra el error pero permite que la aplicación intente continuar.
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "Ocurrió un error aplicando las migraciones a la Base de Datos.");
+        // **IMPORTANTE:** Si tu aplicación NO PUEDE vivir sin la DB, deberías usar 'throw;'
+    }
+}
+// *************************************************************
+
+
 // ----------------------------------------
 // CONFIGURACIÓN DEL PIPELINE HTTP
 // ----------------------------------------
 
+// *** CORRECCIÓN CRÍTICA 3: HABILITACIÓN DE SWAGGER EN PRODUCCIÓN ***
+// Se saca del bloque IsDevelopment() para que sea visible en Railway.
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    // IMPORTANTE: Esto hace que la URL raíz (hu3catalogoproductos-production.up.railway.app/) abra Swagger
+    c.RoutePrefix = string.Empty; 
+});
+// *************************************************************
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    // Se deja el bloque vacío o para otras tareas exclusivas de Dev
 }
 
-// Redirección HTTPS
 app.UseHttpsRedirection();
 
 // Activar autenticación y autorización
