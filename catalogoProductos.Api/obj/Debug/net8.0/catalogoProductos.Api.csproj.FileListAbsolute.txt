@@ -127,3 +127,4 @@ C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProdu
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Api\bin\Debug\net8.0\Microsoft.Extensions.Configuration.dll
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Api\bin\Debug\net8.0\Microsoft.Extensions.Configuration.Abstractions.dll
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Api\bin\Debug\net8.0\Microsoft.Extensions.Primitives.dll
+C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Api\obj\Debug\net8.0\catalogoProductos.Api.sourcelink.json

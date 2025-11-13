@@ -18,8 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\catalogoProductos.Application\catalogoProductos.Application.csproj" />
-    <ProjectReference Include="..\catalogoProductos.Infrastructure\catalogoProductos.Infrastructure.csproj" />
+      <ProjectReference Include="..\catalogoProductos.Application\catalogoProductos.Application.csproj" />
+      <ProjectReference Include="..\catalogoProductos.Infrastructure\catalogoProductos.Infrastructure.csproj" />
+      <ProjectReference Include="..\catalogoProductos.Domain\catalogoProductos.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>

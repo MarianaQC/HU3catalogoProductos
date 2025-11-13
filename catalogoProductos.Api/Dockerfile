@@ -1,26 +1,26 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
+﻿# Etapa 1: build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Copiar los archivos de proyecto (.csproj) de cada capa
+COPY ["catalogoProductos.sln", "./"]
 COPY ["catalogoProductos.Api/catalogoProductos.Api.csproj", "catalogoProductos.Api/"]
 COPY ["catalogoProductos.Application/catalogoProductos.Application.csproj", "catalogoProductos.Application/"]
-COPY ["catalogoProductos.Domain/catalogoProductos.Domain.csproj", "catalogoProductos.Domain/"]
 COPY ["catalogoProductos.Infrastructure/catalogoProductos.Infrastructure.csproj", "catalogoProductos.Infrastructure/"]
-RUN dotnet restore "catalogoProductos.Api/catalogoProductos.Api.csproj"
+COPY ["catalogoProductos.Domain/catalogoProductos.Domain.csproj", "catalogoProductos.Domain/"]
+
+# Restaurar dependencias (a partir del .sln para resolver todas las referencias)
+RUN dotnet restore "catalogoProductos.sln"
+
+# Copiar todo el código fuente al contenedor
 COPY . .
+
+# Compilar y publicar la API
 WORKDIR "/src/catalogoProductos.Api"
-RUN dotnet build "./catalogoProductos.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet publish "catalogoProductos.Api.csproj" -c Release -o /app/publish
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./catalogoProductos.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-
-FROM base AS final
+# Etapa 2: runtime (solo lo necesario para ejecutar la app)
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/publish .
 ENTRYPOINT ["dotnet", "catalogoProductos.Api.dll"]

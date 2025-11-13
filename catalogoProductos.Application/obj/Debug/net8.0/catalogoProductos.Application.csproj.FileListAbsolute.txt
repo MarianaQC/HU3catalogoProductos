@@ -13,3 +13,4 @@ C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProdu
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Application\obj\Debug\net8.0\refint\catalogoProductos.Application.dll
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Application\obj\Debug\net8.0\catalogoProductos.Application.pdb
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Application\obj\Debug\net8.0\ref\catalogoProductos.Application.dll
+C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Application\obj\Debug\net8.0\catalogoProductos.Application.sourcelink.json

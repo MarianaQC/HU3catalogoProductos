@@ -15,3 +15,4 @@ C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProdu
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Infrastructure\obj\Debug\net8.0\catalogoProductos.Infrastructure.pdb
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Infrastructure\obj\Debug\net8.0\catalogoProductos.Infrastructure.genruntimeconfig.cache
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Infrastructure\obj\Debug\net8.0\ref\catalogoProductos.Infrastructure.dll
+C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Infrastructure\obj\Debug\net8.0\catalogoProductos.Infrastructure.sourcelink.json

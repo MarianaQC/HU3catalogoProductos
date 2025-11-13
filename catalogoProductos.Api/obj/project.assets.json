@@ -3048,6 +3048,7 @@
       "Microsoft.EntityFrameworkCore.Design >= 8.0.22",
       "Swashbuckle.AspNetCore >= 6.*",
       "catalogoProductos.Application >= 1.0.0",
+      "catalogoProductos.Domain >= 1.0.0",
       "catalogoProductos.Infrastructure >= 1.0.0"
     ]
   },
@@ -3085,6 +3086,9 @@
           "projectReferences": {
             "C:\\Users\\mcqui\\OneDrive\\Desktop\\HISTORIA USUARIO\\catalogoProductos\\catalogoProductos.Application\\catalogoProductos.Application.csproj": {
               "projectPath": "C:\\Users\\mcqui\\OneDrive\\Desktop\\HISTORIA USUARIO\\catalogoProductos\\catalogoProductos.Application\\catalogoProductos.Application.csproj"
+            },
+            "C:\\Users\\mcqui\\OneDrive\\Desktop\\HISTORIA USUARIO\\catalogoProductos\\catalogoProductos.Domain\\catalogoProductos.Domain.csproj": {
+              "projectPath": "C:\\Users\\mcqui\\OneDrive\\Desktop\\HISTORIA USUARIO\\catalogoProductos\\catalogoProductos.Domain\\catalogoProductos.Domain.csproj"
             },
             "C:\\Users\\mcqui\\OneDrive\\Desktop\\HISTORIA USUARIO\\catalogoProductos\\catalogoProductos.Infrastructure\\catalogoProductos.Infrastructure.csproj": {
               "projectPath": "C:\\Users\\mcqui\\OneDrive\\Desktop\\HISTORIA USUARIO\\catalogoProductos\\catalogoProductos.Infrastructure\\catalogoProductos.Infrastructure.csproj"
@@ -3145,7 +3149,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.416/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Users\\mcqui\\.dotnet\\sdk\\8.0.415/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

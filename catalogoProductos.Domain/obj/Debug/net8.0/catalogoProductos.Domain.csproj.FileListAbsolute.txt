@@ -9,3 +9,4 @@ C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProdu
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Domain\obj\Debug\net8.0\refint\catalogoProductos.Domain.dll
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Domain\obj\Debug\net8.0\catalogoProductos.Domain.pdb
 C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Domain\obj\Debug\net8.0\ref\catalogoProductos.Domain.dll
+C:\Users\mcqui\OneDrive\Desktop\HISTORIA USUARIO\catalogoProductos\catalogoProductos.Domain\obj\Debug\net8.0\catalogoProductos.Domain.sourcelink.json

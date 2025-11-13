@@ -3,6 +3,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using catalogoProductos.Domain.Entities;
+using catalogoProductos.Domain.Interfaces;
 
 namespace catalogoProductos.Api.Controllers
 {
@@ -10,47 +12,81 @@ namespace catalogoProductos.Api.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        // Simulación de usuarios en memoria (luego lo conectaremos a la base de datos)
-        private static List<User> users = new List<User>();
-
+        private readonly IUserRepository _userRepo;
         private readonly IConfiguration _configuration;
 
-        public AuthController(IConfiguration configuration)
+        public AuthController(IUserRepository userRepo, IConfiguration configuration)
         {
+            _userRepo = userRepo;
             _configuration = configuration;
         }
 
         // POST: api/auth/register
         [HttpPost("register")]
-        public IActionResult Register([FromBody] UserRegisterRequest request)
+        public async Task<IActionResult> Register([FromBody] UserRegisterRequest request)
         {
-            if (users.Any(u => u.Email == request.Email))
-                return BadRequest("El usuario ya existe.");
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+                return BadRequest(new { message = "El email y la contraseña son obligatorios." });
+
+            // Verificar si el correo ya existe
+            var existing = await _userRepo.GetByEmailAsync(request.Email);
+            if (existing != null)
+                return BadRequest(new { message = "El usuario ya existe." });
+
+            // Asignar rol automáticamente: si contiene "admin" será Admin
+            var role = request.Email.Contains("admin", StringComparison.OrdinalIgnoreCase)
+                ? Role.Admin
+                : Role.User;
+
+            // Hashear la contraseña
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
 
             var user = new User
             {
-                Id = users.Count + 1,
-                Name = request.Name,
+                UserName = request.Name,
                 Email = request.Email,
-                Password = request.Password // sin hash por ahora, luego lo mejoramos
+                Password = passwordHash,
+                Role = role
             };
 
-            users.Add(user);
-            return Ok(new { message = "Usuario registrado correctamente." });
+            await _userRepo.AddAsync(user);
+            await _userRepo.SaveChangesAsync(); // 🔹 Persistir cambios en la base real
+
+            return Ok(new { message = $"Usuario registrado correctamente con rol {role}." });
         }
 
         // POST: api/auth/login
         [HttpPost("login")]
-        public IActionResult Login([FromBody] UserLoginRequest request)
+        public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
         {
-            var user = users.FirstOrDefault(u => u.Email == request.Email && u.Password == request.Password);
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+                return BadRequest(new { message = "El email y la contraseña son obligatorios." });
+
+            var user = await _userRepo.GetByEmailAsync(request.Email);
             if (user == null)
-                return Unauthorized("Credenciales incorrectas.");
+                return Unauthorized(new { message = "Usuario no encontrado." });
+
+            var validPassword = BCrypt.Net.BCrypt.Verify(request.Password, user.Password);
+            if (!validPassword)
+                return Unauthorized(new { message = "Contraseña incorrecta." });
 
             var token = GenerateJwtToken(user);
-            return Ok(new { token });
+            return Ok(new
+            {
+                token,
+                user = new
+                {
+                    user.Id,
+                    user.UserName,
+                    user.Email,
+                    Role = user.Role.ToString()
+                }
+            });
         }
 
+        // -------------------------------------
+        // TOKEN JWT
+        // -------------------------------------
         private string GenerateJwtToken(User user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
@@ -59,15 +95,18 @@ namespace catalogoProductos.Api.Controllers
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim("name", user.Name),
-                new Claim("role", "User")
+                new Claim("name", user.UserName),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["Jwt:Issuer"],
                 audience: _configuration["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddHours(1),
+                expires: DateTime.UtcNow.AddMinutes(
+                    double.Parse(_configuration["Jwt:DurationInMinutes"] ?? "60")
+                ),
                 signingCredentials: creds
             );
 
@@ -75,15 +114,7 @@ namespace catalogoProductos.Api.Controllers
         }
     }
 
-    // Modelos auxiliares
-    public class User
-    {
-        public int Id { get; set; }
-        public string Name { get; set; } = "";
-        public string Email { get; set; } = "";
-        public string Password { get; set; } = "";
-    }
-
+    // Modelos auxiliares (solo para peticiones)
     public class UserRegisterRequest
     {
         public string Name { get; set; } = "";
