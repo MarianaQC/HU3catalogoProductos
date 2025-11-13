@@ -7,7 +7,6 @@ COPY ["catalogoProductos.sln", "./"]
 COPY ["catalogoProductos.Api/catalogoProductos.Api.csproj", "catalogoProductos.Api/"]
 COPY ["catalogoProductos.Application/catalogoProductos.Application.csproj", "catalogoProductos.Application/"]
 COPY ["catalogoProductos.Infrastructure/catalogoProductos.Infrastructure.csproj", "catalogoProductos.Infrastructure/"]
-# ************ CORRECCIÓN APLICADA AQUÍ ************
 COPY ["catalogoProductos.Domain/catalogoProductos.Domain.csproj", "catalogoProductos.Domain/"]
 
 # Restaurar dependencias (a partir del .sln para resolver todas las referencias)
