@@ -7,7 +7,7 @@ COPY ["catalogoProductos.sln", "./"]
 COPY ["catalogoProductos.Api/catalogoProductos.Api.csproj", "catalogoProductos.Api/"]
 COPY ["catalogoProductos.Application/catalogoProductos.Application.csproj", "catalogoProductos.Application/"]
 COPY ["catalogoProductos.Infrastructure/catalogoProductos.Infrastructure.csproj", "catalogoProductos.Infrastructure/"]
-COPY ["catalogoProductos.Domain/catalogoProductos.Domain.csproj", "catalogoProductos.Domain/"]
+COPY ["catalogoProductos.Domain/catagoProductos.Domain.csproj", "catalogoProductos.Domain/"]
 
 # Restaurar dependencias (a partir del .sln para resolver todas las referencias)
 RUN dotnet restore "catalogoProductos.sln"
@@ -22,5 +22,15 @@ RUN dotnet publish "catalogoProductos.Api.csproj" -c Release -o /app/publish
 # Etapa 2: runtime (solo lo necesario para ejecutar la app)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
+
+# Expone el puerto 8080 (Railway necesita saberlo)
+EXPOSE 8080
+
+# Copia los archivos publicados desde la etapa anterior
 COPY --from=build /app/publish .
+
+# Variable de entorno para .NET (opcional pero buena práctica)
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
 ENTRYPOINT ["dotnet", "catalogoProductos.Api.dll"]
